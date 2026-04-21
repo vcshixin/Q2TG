@@ -1,4 +1,5 @@
 import type { MessageElem, MessageRet, MfaceElem, Quotable } from '@icqqjs/icqq';
+import type { QQClient } from './index';
 import { Gender, GroupRole } from '@icqqjs/icqq/lib/common';
 import { AtElem, FaceElem, ForwardNode, ImageElem, PttElem, TextElem, VideoElem } from '@icqqjs/icqq/lib/message/elements';
 import { FaceElemEx, ImageElemEx } from '../NapCatClient/convert';
@@ -8,7 +9,7 @@ export type SendableElem = TextElem | FaceElem | ImageElem | AtElem | PttElem | 
 export type Sendable = SendableElem | string | (SendableElem | string)[];
 
 export interface QQEntity {
-  readonly client: { uin: number };
+  readonly client: QQClient;
   readonly dm: boolean;
 
   getForwardMsg(resid: string, fileName?: string): Promise<ForwardMessage[]>;
