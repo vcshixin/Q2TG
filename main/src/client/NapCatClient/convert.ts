@@ -92,7 +92,12 @@ export const messageElemToNapCatSendable = async (elem: SendableElem): Promise<{
     }
     case 'sface':
     default:
-      throw new Error('不支持此元素');
+      return noTmp({
+        type: 'text',
+        data: {
+          text: `[不支持的元素:${(elem as any).type || 'unknown'}]`,
+        },
+      } as any);
   }
 };
 
@@ -172,7 +177,10 @@ export const napCatReceiveToMessageElem = (data: Receive[keyof Receive]): Messag
         id: data.data.id,
       };
     default:
-      throw new Error('不支持此元素');
+      return {
+        type: 'text',
+        text: '[不支持的元素]',
+      } as any;
   }
 };
 

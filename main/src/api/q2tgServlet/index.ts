@@ -7,14 +7,20 @@ import processNestedForward from '../../utils/processNestedForward';
 const forwardCache = new Map<string, any>();
 
 let app = new Elysia()
-  .post('/Q2tgServlet/GetForwardMultipleMessageApi', async ({ body }) => {
+  .post('/Q2tgServlet/GetForwardMultipleMessageApi', async ({ body, error }) => {
     // @ts-ignore
     const uuid = body.uuid;
     if (!forwardCache.has(uuid)) {
       const data = await db.forwardMultiple.findFirst({
         where: { id: uuid },
       });
+      if (!data) {
+        throw error(404, 'Forward record not found');
+      }
       const pair = Pair.getByDbId(data.fromPairId);
+      if (!pair) {
+        throw error(404, 'Forward pair not found');
+      }
       const messages = await pair.qq.getForwardMsg(data.resId, data.fileName);
       if (pair.qqClient instanceof OicqClient) {
         await pair.qqClient.refreshImageRKey(messages);
