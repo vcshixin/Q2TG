@@ -101,7 +101,9 @@ export default class {
       else {
         memberInfo = await sourceMember.renew();
       }
-      const memberName = await sourceMember.client.resolveGroupMemberDisplayName(memberInfo.user_id, memberInfo.card, memberInfo.nickname);
+      const memberName = 'gid' in sourceMember
+        ? await (sourceMember.client as any).resolveGroupMemberDisplayName(memberInfo.user_id, memberInfo.card, memberInfo.nickname)
+        : (memberInfo.card || memberInfo.nickname);
       to = {
         from: 'qq',
         name: memberName,

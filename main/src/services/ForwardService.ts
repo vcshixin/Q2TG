@@ -292,7 +292,9 @@ export default class ForwardService {
               else {
                 const member = (pair.qq as Group).pickMember(elem.qq as number);
                 const info = await member.renew();
-                const memberName = await member.client.resolveGroupMemberDisplayName(info.user_id, info.card, info.nickname);
+                const memberName = 'gid' in member
+                  ? await (member.client as any).resolveGroupMemberDisplayName(info.user_id, info.card, info.nickname)
+                  : (info.card || info.nickname);
                 elem.text = `@${memberName}`;
               }
             }

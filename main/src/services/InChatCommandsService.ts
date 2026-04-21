@@ -50,7 +50,9 @@ export default class InChatCommandsService {
             memberInfo = await sender.renew();
           }
 
-          const senderName = await sender.client.resolveGroupMemberDisplayName(memberInfo.user_id, memberInfo.card, memberInfo.nickname);
+          const senderName = 'gid' in sender
+            ? await (sender.client as any).resolveGroupMemberDisplayName(memberInfo.user_id, memberInfo.card, memberInfo.nickname)
+            : (memberInfo.card || memberInfo.nickname);
           textToSend += `<b>发送者：</b>${memberInfo.title ? `「<i>${memberInfo.title}</i>」` : ''}` +
             `${senderName}(<code>${sender.uin}</code>)\n`;
           if (memberInfo.role !== 'member') {
