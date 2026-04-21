@@ -1,4 +1,4 @@
-import { CreateQQClientParamsBase, Friend, FriendIncreaseEvent, Group, GroupMemberDecreaseEvent, GroupMemberIncreaseEvent, GroupNameChangeEvent, InputStatusChangeEvent, MessageEvent, MessageRecallEvent, PokeEvent, QQClient, SendableElem } from '../QQClient';
+import { CreateQQClientParamsBase, ForwardMessage, Friend, FriendIncreaseEvent, Group, GroupMemberDecreaseEvent, GroupMemberIncreaseEvent, GroupNameChangeEvent, InputStatusChangeEvent, MessageEvent, MessageRecallEvent, PokeEvent, QQClient, SendableElem } from '../QQClient';
 import random from '../../utils/random';
 import { getLogger, Logger } from 'log4js';
 import posthog from '../../models/posthog';
@@ -24,6 +24,10 @@ export class NapCatClient extends QQClient {
 
   private readonly ws: ReconnectingWebSocket;
   private readonly logger: Logger;
+  private readonly friendCache = new Map<number, { nickname: string; remark: string; updatedAt: number }>();
+  private friendCacheRefreshPromise?: Promise<void>;
+  private readonly friendCacheTtlMs = 15 * 60 * 1000;
+  private friendCacheLastRefreshAt = 0;
 
   public static async create(params: CreateNapCatParams) {
     const instance = new this(params.id, params.wsUrl);
@@ -107,6 +111,9 @@ export class NapCatClient extends QQClient {
       // 上报没有群名
       chat = await this.pickGroup(data.group_id);
     }
+    const senderName = data.message_type === 'group'
+      ? await this.resolveGroupMemberDisplayName(data.sender.user_id, data.sender.card, data.sender.nickname)
+      : (data.sender.card || data.sender.nickname);
     const message = (data.message as unknown as Receive[keyof Receive][]);
     const replyNode = message.find(it => it.type === 'reply');
     if (replyNode) {
@@ -114,7 +121,7 @@ export class NapCatClient extends QQClient {
     }
     const replyMessage = replyNode ? await this.getMessage(replyNode.data.id) : undefined;
     const event = new MessageEvent(
-      { id: data.sender.user_id, card: data.sender.card, nickname: data.sender.nickname, name: data.sender.card || data.sender.nickname },
+      { id: data.sender.user_id, card: data.sender.card, nickname: data.sender.nickname, name: senderName },
       chat,
       message.map(napCatReceiveToMessageElem),
       data.message_id,
@@ -139,7 +146,8 @@ export class NapCatClient extends QQClient {
 
   private async handleGroupIncrease(data: WSReceiveHandler['notice.group_increase']) {
     const user = await this.callApi('get_stranger_info', { user_id: data.user_id });
-    const event = new GroupMemberIncreaseEvent(await this.pickGroup(data.group_id), data.user_id, user.nickname);
+    this.updateFriendCacheEntry({ uid: data.user_id, nickname: user.nickname, remark: user.remark || '' });
+    const event = new GroupMemberIncreaseEvent(await this.pickGroup(data.group_id), data.user_id, user.remark || user.nickname);
     await this.callHandlers(this.onGroupMemberIncreaseHandlers, event);
   }
 
@@ -196,6 +204,7 @@ export class NapCatClient extends QQClient {
     const data = await this.callApi('get_login_info');
     this.uin = data.user_id;
     this.nickname = data.nickname;
+    await this.ensureFriendCache();
   }
 
   public async isOnline(): Promise<boolean> {
@@ -203,37 +212,152 @@ export class NapCatClient extends QQClient {
     return data.online;
   }
 
+  private normalizeFriendInfo(info: any) {
+    return {
+      nickname: info.nick || info.nickname || '',
+      uid: parseInt(info.uin || info.user_id),
+      remark: info.remark || '',
+    };
+  }
+
+  public updateFriendCacheEntry(info: { nickname: string; uid: number; remark: string }) {
+    if (!Number.isFinite(info.uid)) return;
+    this.friendCache.set(info.uid, {
+      nickname: info.nickname || '',
+      remark: info.remark || '',
+      updatedAt: Date.now(),
+    });
+  }
+
+  public getCachedFriendDisplayName(userId: number, fallback?: string) {
+    const cached = this.friendCache.get(userId);
+    return cached?.remark || fallback || cached?.nickname || '';
+  }
+
+  public async ensureFriendCache(force = false) {
+    if (!force && this.friendCache.size && Date.now() - this.friendCacheLastRefreshAt < this.friendCacheTtlMs) {
+      return;
+    }
+    if (!force && this.friendCacheRefreshPromise) {
+      await this.friendCacheRefreshPromise;
+      return;
+    }
+    const refresh = this.refreshFriendCache();
+    this.friendCacheRefreshPromise = refresh;
+    try {
+      await refresh;
+    }
+    finally {
+      if (this.friendCacheRefreshPromise === refresh) {
+        this.friendCacheRefreshPromise = undefined;
+      }
+    }
+  }
+
+  public async refreshFriendCache() {
+    const data = await this.callApi('get_friends_with_category');
+    const nextCache = new Map<number, { nickname: string; remark: string; updatedAt: number }>();
+    const put = (raw: any) => {
+      const friend = this.normalizeFriendInfo(raw);
+      if (!Number.isFinite(friend.uid)) return;
+      nextCache.set(friend.uid, {
+        nickname: friend.nickname,
+        remark: friend.remark,
+        updatedAt: Date.now(),
+      });
+    };
+    if (data[0]?.buddyList === undefined) {
+      for (const entry of data as any[]) {
+        put(entry);
+      }
+    }
+    else {
+      for (const category of data as any[]) {
+        for (const friend of category.buddyList || []) {
+          put(friend);
+        }
+      }
+    }
+    this.friendCache.clear();
+    for (const [uid, friend] of nextCache.entries()) {
+      this.friendCache.set(uid, friend);
+    }
+    this.friendCacheLastRefreshAt = Date.now();
+  }
+
+  public async resolveFriendDisplayName(userId: number, fallback?: string) {
+    const cached = this.friendCache.get(userId);
+    if (cached && Date.now() - cached.updatedAt < this.friendCacheTtlMs) {
+      return cached.remark || fallback || cached.nickname || '';
+    }
+
+    if (!this.friendCache.size) {
+      await this.ensureFriendCache();
+      const refreshed = this.friendCache.get(userId);
+      if (refreshed) {
+        return refreshed.remark || fallback || refreshed.nickname || '';
+      }
+    }
+
+    try {
+      const friend = await NapCatFriend.create(this, userId);
+      this.updateFriendCacheEntry({ uid: userId, nickname: friend.nickname, remark: friend.remark });
+      return friend.remark || fallback || friend.nickname || '';
+    }
+    catch {
+      return cached?.remark || fallback || cached?.nickname || '';
+    }
+  }
+
+  public async resolveGroupMemberDisplayName(userId: number, card?: string, nickname?: string) {
+    return await this.resolveFriendDisplayName(userId, card || nickname || '');
+  }
+
+  public async decorateForwardMessages(messages: ForwardMessage[]) {
+    await Promise.all(messages.map(async (message) => {
+      message.nickname = await this.resolveFriendDisplayName(message.user_id, message.nickname);
+    }));
+    return messages;
+  }
+
   public async getFriendsWithCluster(): Promise<{ name: string; friends: Friend[]; }[]> {
     const data = await this.callApi('get_friends_with_category');
     if (data[0].buddyList === undefined) {
       const categories = new Map<number, { name: string; friends: Friend[]; }>();
-      for (const _entry of data) {
-        const it = _entry as any;
-        let category = categories.get(it.categoryId);
+      for (const entry of data as any[]) {
+        const friend = this.normalizeFriendInfo(entry);
+        this.updateFriendCacheEntry(friend);
+        let category = categories.get(entry.categoryId);
         if (!category) {
-          category = { name: it.categoryName || it.categroyName, friends: [] };
-          categories.set(it.categoryId, category);
+          category = { name: entry.categoryName || entry.categroyName, friends: [] };
+          categories.set(entry.categoryId, category);
         }
-        category.friends.push(NapCatFriend.createExisted(this, {
-          nickname: it.nick || it.nickname,
-          uid: parseInt(it.uin),
-          remark: it.remark,
-        }));
+        category.friends.push(NapCatFriend.createExisted(this, friend));
       }
       return Array.from(categories.values());
     }
-    return data.map(it => ({
-      name: it.categoryName || (it as any).categroyName, // typo in API
-      friends: it.buddyList.map(friend => NapCatFriend.createExisted(this, {
-        nickname: friend.nick,
-        uid: parseInt(friend.uin),
-        remark: friend.remark,
-      })),
+    return (data as any[]).map(category => ({
+      name: category.categoryName || category.categroyName, // typo in API
+      friends: (category.buddyList || []).map((friend: any) => {
+        const normalized = this.normalizeFriendInfo(friend);
+        this.updateFriendCacheEntry(normalized);
+        return NapCatFriend.createExisted(this, normalized);
+      }),
     }));
   }
 
-  public pickFriend(uin: number): Promise<Friend> {
-    return NapCatFriend.create(this, uin);
+  public async pickFriend(uin: number, tempChatFromGroupId?: number): Promise<Friend> {
+    const cached = this.friendCache.get(uin);
+    if (cached) {
+      return NapCatFriend.createExisted(this, {
+        uid: uin,
+        nickname: cached.nickname,
+        remark: cached.remark,
+      });
+    }
+    const friend = await NapCatFriend.create(this, uin);
+    this.updateFriendCacheEntry({ uid: uin, nickname: friend.nickname, remark: friend.remark });
+    return friend;
   }
 
   public async getGroupList(): Promise<Group[]> {

@@ -46,9 +46,15 @@ export default class InChatCommandsService {
           if (sender instanceof OicqMember) {
             memberInfo = await sender.renew();
           }
+          else {
+            memberInfo = await sender.renew();
+          }
 
+          const senderName = 'resolveGroupMemberDisplayName' in sender.client
+            ? await sender.client.resolveGroupMemberDisplayName(memberInfo.user_id, memberInfo.card, memberInfo.nickname)
+            : (memberInfo.card || memberInfo.nickname);
           textToSend += `<b>发送者：</b>${memberInfo.title ? `「<i>${memberInfo.title}</i>」` : ''}` +
-            `${memberInfo.card || memberInfo.nickname}(<code>${sender.uin}</code>)\n`;
+            `${senderName}(<code>${sender.uin}</code>)\n`;
           if (memberInfo.role !== 'member') {
             textToSend += `<b>职务：</b>${memberInfo.role === 'owner' ? '群主' : '管理员'}\n`;
           }

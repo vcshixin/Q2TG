@@ -25,14 +25,17 @@ export default new Elysia()
         return 'Member not found';
       }
       let profile: UserProfile, memberInfo: GroupMemberInfo;
+      let displayName = '';
       if (member instanceof OicqMember) {
         memberInfo = member.info;
+        displayName = memberInfo.card || memberInfo.nickname;
         profile = await member.client.getProfile(member.uin);
       }
       else if (member instanceof NapCatGroupMember) {
         memberInfo = await member.renew();
         const user = await member.client.pickFriend(member.uin) as NapCatFriend;
         const info = await user.renew();
+        displayName = info.remark || memberInfo.card || memberInfo.nickname;
         profile = {
           // @ts-ignore
           birthday: [info.birthday_year, info.birthday_month, info.birthday_day],
@@ -70,8 +73,8 @@ export default new Elysia()
             <meta property="og:site_name" content={`${memberInfo.role === 'member' ? '' : memberInfo.role}「${memberInfo.title}」`}/> :
             <meta property="og:site_name" content={memberInfo.role}/>
         }
-        <meta property="og:title" content={memberInfo.card || memberInfo.nickname}/>
-        <title>群成员：{memberInfo.card || memberInfo.nickname}</title>
+        <meta property="og:title" content={displayName}/>
+        <title>群成员：{displayName}</title>
         {/* language=CSS */}
         <style>{`
           html, body {
@@ -156,9 +159,9 @@ export default new Elysia()
         <div id="card">
           <div>
             <span class={`badge badge-${memberInfo.role} ${memberInfo.title && 'badge-hasTitle'}`}>{memberInfo.title || memberInfo.role}</span>
-            {memberInfo.card || memberInfo.nickname}
+            {displayName}
           </div>
-          {memberInfo.card && <div class="secondary">
+          {displayName !== memberInfo.nickname && <div class="secondary">
             {memberInfo.nickname}
           </div>}
           <div class="secondary">

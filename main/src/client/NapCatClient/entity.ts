@@ -40,7 +40,7 @@ export abstract class NapCatEntity implements QQEntity {
   async getForwardMsg(resid: string, fileName?: string) {
     // @ts-ignore
     const data = await this.client.callApi('get_forward_msg', { message_id: resid });
-    return napCatForwardMultiple(data.messages);
+    return await this.client.decorateForwardMessages(napCatForwardMultiple(data.messages));
   }
 
   async getVideoUrl(fid: string, md5?: string | Buffer): Promise<string> {
@@ -164,6 +164,7 @@ export class NapCatFriend extends NapCatUser implements Friend {
     const data = await this.client.callApi('get_stranger_info', { user_id: this.uin });
     this.nickname = data.nickname;
     this.remark = data.remark;
+    this.client.updateFriendCacheEntry({ uid: this.uin, nickname: this.nickname, remark: this.remark });
     return data;
   }
 

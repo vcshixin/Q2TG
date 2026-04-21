@@ -28,7 +28,7 @@ export default class GroupNameRefreshController {
 
     if(event.operator instanceof NapCatGroupMember) {
       const operatorInfo = await event.operator.renew();
-      let operatorName = operatorInfo.card || operatorInfo.nickname;
+      let operatorName = await event.operator.client.resolveGroupMemberDisplayName(operatorInfo.user_id, operatorInfo.card, operatorInfo.nickname);
       if (!((pair.flags | this.instance.flags) & flags.DISABLE_RICH_HEADER) && env.WEB_ENDPOINT) {
         const richHeaderUrl = helper.generateRichHeaderUrl(pair.apiKey, operatorInfo.user_id, operatorName);
         operatorName = `<a href="${richHeaderUrl}">${operatorName}</a>`;

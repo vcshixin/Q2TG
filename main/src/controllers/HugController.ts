@@ -101,9 +101,12 @@ export default class {
       else {
         memberInfo = await sourceMember.renew();
       }
+      const memberName = 'resolveGroupMemberDisplayName' in sourceMember.client
+        ? await sourceMember.client.resolveGroupMemberDisplayName(memberInfo.user_id, memberInfo.card, memberInfo.nickname)
+        : (memberInfo.card || memberInfo.nickname);
       to = {
         from: 'qq',
-        name: memberInfo.card || memberInfo.nickname,
+        name: memberName,
         id: event.replyTo.fromId,
       };
     }

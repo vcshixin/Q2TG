@@ -180,7 +180,7 @@ export const napCatForwardMultiple = (messages: WSSendReturn['get_forward_msg'][
   group_id: it.message_type === 'group' ? it.group_id : undefined,
   nickname: it.sender.card || it.sender.nickname,
   time: it.time,
-  user_id: it.sender.user_id,
+  user_id: Number(it.sender.user_id || (it.sender as any).uin),
   seq: it.message_id,
   raw_message: it.raw_message,
   message: ((it as any).content || (it as any).message).map(napCatReceiveToMessageElem),
