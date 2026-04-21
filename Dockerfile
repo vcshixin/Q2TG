@@ -20,6 +20,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     libpixman-1-dev libcairo2-dev libpango1.0-dev libgif-dev libjpeg62-turbo-dev libpng-dev librsvg2-dev libvips-dev
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml .npmrc /app/
 COPY patches /app/patches
+COPY vendor_icqq /app/vendor_icqq
 COPY main/package.json /app/main/
 COPY ui/ /app/ui/
 
