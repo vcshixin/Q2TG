@@ -215,9 +215,7 @@ export default class ForwardController {
       const chat = event.chat as Group;
       const operator = chat.pickMember(event.fromId);
       let operatorInfo = await operator.renew();
-      operatorName = 'resolveGroupMemberDisplayName' in operator.client
-        ? await operator.client.resolveGroupMemberDisplayName(operatorInfo.user_id, operatorInfo.card, operatorInfo.nickname)
-        : (operatorInfo.card || operatorInfo.nickname);
+      operatorName = await operator.client.resolveGroupMemberDisplayName(operatorInfo.user_id, operatorInfo.card, operatorInfo.nickname);
       if (!((pair.flags | this.instance.flags) & flags.DISABLE_RICH_HEADER) && env.WEB_ENDPOINT) {
         const richHeaderUrl = helper.generateRichHeaderUrl(pair.apiKey, operatorInfo.user_id, operatorName);
         operatorName = `<a href="${richHeaderUrl}">${operatorName}</a>`;
@@ -228,9 +226,7 @@ export default class ForwardController {
       else {
         const targetUser = chat.pickMember(event.targetId);
         let targetInfo = await targetUser.renew();
-        targetName = 'resolveGroupMemberDisplayName' in targetUser.client
-          ? await targetUser.client.resolveGroupMemberDisplayName(targetInfo.user_id, targetInfo.card, targetInfo.nickname)
-          : (targetInfo.card || targetInfo.nickname);
+        targetName = await targetUser.client.resolveGroupMemberDisplayName(targetInfo.user_id, targetInfo.card, targetInfo.nickname);
         if (!((pair.flags | this.instance.flags) & flags.DISABLE_RICH_HEADER) && env.WEB_ENDPOINT) {
           const richHeaderUrl = helper.generateRichHeaderUrl(pair.apiKey, targetInfo.user_id, targetName);
           targetName = `<a href="${richHeaderUrl}">${targetName}</a>`;

@@ -211,6 +211,10 @@ export abstract class QQClient {
 
   public abstract pickGroup(groupId: number): Promise<Group>;
 
+  public async resolveGroupMemberDisplayName(userId: number, card?: string, nickname?: string) {
+    return card || nickname || '';
+  }
+
   public async createSpoilerImageEndpoint(image: ImageElem, nickname: string, title?: string): Promise<SendableElem[]> {
     const res: SendableElem[] = [
       {
