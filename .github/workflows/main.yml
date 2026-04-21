@@ -56,4 +56,4 @@ jobs:
             "REF=${{ github.ref }}"
             "COMMIT=${{ github.sha }}"
           secrets: |
-            "npmrc=//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}"
+            "npmrc=//npm.pkg.github.com/:_authToken=${{ secrets.GPR_TOKEN }}"
