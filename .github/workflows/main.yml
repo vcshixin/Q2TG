@@ -55,5 +55,3 @@ jobs:
             "REPO=${{ github.repository }}"
             "REF=${{ github.ref }}"
             "COMMIT=${{ github.sha }}"
-          secrets: |
-            "npmrc=//npm.pkg.github.com/:_authToken=${{ secrets.GPR_TOKEN }}"

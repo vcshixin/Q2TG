@@ -5,9 +5,6 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
-  '@icqqjs/icqq@1.4.0':
-    hash: 4w6g4n5xncjdap3ncvvtjfe2uy
-    path: patches/@icqqjs__icqq@1.4.0.patch
   telegram@2.26.8:
     hash: 6ezi5zx3h54zaimfvrhyk2gpfa
     path: patches/telegram@2.26.8.patch
@@ -26,8 +23,8 @@ importers:
         specifier: ^0.6.4
         version: 0.6.4(elysia@1.1.26(@sinclair/typebox@0.34.13)(typescript@5.7.2))
       '@icqqjs/icqq':
-        specifier: 1.4.0
-        version: 1.4.0(patch_hash=4w6g4n5xncjdap3ncvvtjfe2uy)(bufferutil@4.0.8)(elysia@1.1.26(@sinclair/typebox@0.34.13)(typescript@5.7.2))(utf-8-validate@5.0.10)
+        specifier: file:../vendor_icqq
+        version: file:vendor_icqq(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@prisma/client':
         specifier: 6.1.0
         version: 6.1.0(prisma@6.1.0)
@@ -168,8 +165,8 @@ importers:
         specifier: ^1.1.2
         version: 1.1.3(elysia@1.1.26(@sinclair/typebox@0.34.13)(typescript@5.7.2))
       '@icqqjs/icqq':
-        specifier: 1.4.0
-        version: 1.4.0(patch_hash=4w6g4n5xncjdap3ncvvtjfe2uy)(bufferutil@4.0.8)(elysia@1.1.26(@sinclair/typebox@0.34.13)(typescript@5.7.2))(utf-8-validate@6.0.5)
+        specifier: file:../vendor_icqq
+        version: file:vendor_icqq(bufferutil@4.0.8)(utf-8-validate@6.0.5)
       '@unocss/reset':
         specifier: ^0.62.0
         version: 0.62.4
@@ -814,8 +811,8 @@ packages:
   '@iconify/utils@2.2.1':
     resolution: {integrity: sha512-0/7J7hk4PqXmxo5PDBDxmnecw5PxklZJfNjIVG9FM0mEfVrvfudS22rYWsqVk6gR3UJ/mSYS90X4R3znXnqfNA==}
 
-  '@icqqjs/icqq@1.4.0':
-    resolution: {integrity: sha512-HutCMUGcHcSwNPRlZA5pMVbEDEPKsU4akcoehDzOqBYiutYeKUQAO9oq195m4MMNPGmg9N+dgrpfxbFHAE9paw==, tarball: https://npm.pkg.github.com/download/@icqqjs/icqq/1.4.0/de2627161f651c185d6528e4871c4bed61db6e71}
+  '@icqqjs/icqq@file:vendor_icqq':
+    resolution: {directory: vendor_icqq, type: directory}
     engines: {node: '>= v14'}
 
   '@img/sharp-darwin-arm64@0.33.5':
@@ -2240,6 +2237,7 @@ packages:
   fluent-ffmpeg@2.1.3:
     resolution: {integrity: sha512-Be3narBNt2s6bsaqP6Jzq91heDgOEaDCJAXcE3qcma/EJBSy5FB4cvO31XBInuAuKBx8Kptf8dkhjK0IOru39Q==}
     engines: {node: '>=18'}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   follow-redirects@1.15.9:
     resolution: {integrity: sha512-gew4GsXizNgdoRyqmyfMHyAmXsZDk6mHkSxZFCzW9gwlbtOW44CDtYavM+y+72qD/Vq2l550kMF52DT8fOLJqQ==}
@@ -2320,11 +2318,12 @@ packages:
 
   glob@10.4.5:
     resolution: {integrity: sha512-7Bv8RF0k6xjo7d4A/PxYLbUCfb6c+Vpd2/mB2yRDlew7Jb5hEXiCD9ibfO7wpk8i4sevK6DFny9h7EYbM3/sHg==}
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     hasBin: true
 
   glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
-    deprecated: Glob versions prior to v9 are no longer supported
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   global@4.4.0:
     resolution: {integrity: sha512-wv/LAoHdRE3BeTGz53FAamhGlPLhlssK45usmGFThIi4XqnBmjKQ16u+RNbP7WvigRZDxUsM0J3gcQ5yicaL0w==}
@@ -2589,7 +2588,7 @@ packages:
   koa-router@7.4.0:
     resolution: {integrity: sha512-IWhaDXeAnfDBEpWS6hkGdZ1ablgr6Q6pGdXCyK38RbzuH4LkUOpPqPw+3f8l8aTDrQmBQ7xJc0bs2yV4dzcO+g==}
     engines: {node: '>= 4'}
-    deprecated: '**IMPORTANT 10x+ PERFORMANCE UPGRADE**: Please upgrade to v12.0.1+ as we have fixed an issue with debuglog causing 10x slower router benchmark performance, see https://github.com/koajs/router/pull/173'
+    deprecated: 'Please use @koa/router instead, starting from v9! '
 
   koa@2.15.3:
     resolution: {integrity: sha512-j/8tY9j5t+GVMLeioLaxweJiKUayFhlGqNTzf2ZGwL0ZCQijd2RLHK0SLW5Tsko8YyyqCZC2cojIb0/s62qTAg==}
@@ -2996,6 +2995,7 @@ packages:
   prebuild-install@7.1.2:
     resolution: {integrity: sha512-UnNke3IQb6sgarcZIDU3gbMeTp/9SSU1DAIkil7PrqG1vZlBtY5msYccSKSHDqa3hNg436IXK+SNImReuA1wEQ==}
     engines: {node: '>=10'}
+    deprecated: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.
     hasBin: true
 
   prisma@6.1.0:
@@ -3026,11 +3026,6 @@ packages:
   punycode@2.3.1:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
-
-  q2tg-main@file:main:
-    resolution: {directory: main, type: directory}
-    engines: {node: '>=22.0.0'}
-    hasBin: true
 
   qs@6.12.1:
     resolution: {integrity: sha512-zWmv4RSuB9r2mYQw3zxQuHWeU+42aKi1wWig/j4ele4ygELZ7PEO6MM7rim9oAQH2A5MWfsAVf/jPvTPgCbvUQ==}
@@ -3330,6 +3325,7 @@ packages:
   tar@6.2.1:
     resolution: {integrity: sha512-DZ4yORTwrbTj/7MZYq2w+/ZFdI6OZ/f9SFHR+71gIVUZhOQPHzVCLpvRnPgyaMpfWxxk/4ONva3GQSyNIKRv6A==}
     engines: {node: '>=10'}
+    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   telegraf@3.40.0:
     resolution: {integrity: sha512-wulVjRHrX2zQwbk1/jzg3Ll9Kr0xC7ofXsRPJgcV2yoCFx5oSU41ZaDKNRPsLhjXxW4s9iNM2S2N/ESyiZxTMQ==}
@@ -3616,6 +3612,7 @@ packages:
 
   whatwg-encoding@1.0.5:
     resolution: {integrity: sha512-b5lim54JOPN9HtzvK9HFXvBma/rnfFeqsic0hSpjtDbVxR3dJKLc+KB4V6GgiGOvl7CY/KNh8rxSo9DKQrnUEw==}
+    deprecated: Use @exodus/bytes instead for a more spec-conformant and faster implementation
 
   whatwg-fetch@3.6.20:
     resolution: {integrity: sha512-EqhiFU6daOA8kpjOWTL0olhVOF3i7OrFzSYiGsEMB8GcXS+RrzauAERX65xMeNWVqxA6HXH2m69Z9LaKKdisfg==}
@@ -3711,6 +3708,7 @@ packages:
   yaeti@0.0.6:
     resolution: {integrity: sha512-MvQa//+KcZCUkBTIC9blM+CU9J2GzuTytsOUwf2lidtvkx/6gnEp1QvJv34t9vdjhFmha/mUiNDbN0D0mJWdug==}
     engines: {node: '>=0.10.32'}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   yallist@3.1.1:
     resolution: {integrity: sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g==}
@@ -4185,9 +4183,8 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@icqqjs/icqq@1.4.0(patch_hash=4w6g4n5xncjdap3ncvvtjfe2uy)(bufferutil@4.0.8)(elysia@1.1.26(@sinclair/typebox@0.34.13)(typescript@5.7.2))(utf-8-validate@5.0.10)':
+  '@icqqjs/icqq@file:vendor_icqq(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@icqqjs/icqq': q2tg-main@file:main(bufferutil@4.0.8)(elysia@1.1.26(@sinclair/typebox@0.34.13)(typescript@5.7.2))(utf-8-validate@5.0.10)
       axios: 1.7.9
       log4js: 6.9.1
       long: 5.2.3
@@ -4199,14 +4196,11 @@ snapshots:
     transitivePeerDependencies:
       - bufferutil
       - debug
-      - elysia
-      - encoding
       - supports-color
       - utf-8-validate
 
-  '@icqqjs/icqq@1.4.0(patch_hash=4w6g4n5xncjdap3ncvvtjfe2uy)(bufferutil@4.0.8)(elysia@1.1.26(@sinclair/typebox@0.34.13)(typescript@5.7.2))(utf-8-validate@6.0.5)':
+  '@icqqjs/icqq@file:vendor_icqq(bufferutil@4.0.8)(utf-8-validate@6.0.5)':
     dependencies:
-      '@icqqjs/icqq': q2tg-main@file:main(bufferutil@4.0.8)(elysia@1.1.26(@sinclair/typebox@0.34.13)(typescript@5.7.2))(utf-8-validate@6.0.5)
       axios: 1.7.9
       log4js: 6.9.1
       long: 5.2.3
@@ -4218,8 +4212,6 @@ snapshots:
     transitivePeerDependencies:
       - bufferutil
       - debug
-      - elysia
-      - encoding
       - supports-color
       - utf-8-validate
 
@@ -6058,78 +6050,6 @@ snapshots:
 
   jsbn@1.1.0: {}
 
-  jsdom@16.7.0(bufferutil@4.0.8)(canvas@2.11.2)(utf-8-validate@5.0.10):
-    dependencies:
-      abab: 2.0.6
-      acorn: 8.12.1
-      acorn-globals: 6.0.0
-      cssom: 0.4.4
-      cssstyle: 2.3.0
-      data-urls: 2.0.0
-      decimal.js: 10.4.3
-      domexception: 2.0.1
-      escodegen: 2.1.0
-      form-data: 3.0.2
-      html-encoding-sniffer: 2.0.1
-      http-proxy-agent: 4.0.1
-      https-proxy-agent: 5.0.1
-      is-potential-custom-element-name: 1.0.1
-      nwsapi: 2.2.10
-      parse5: 6.0.1
-      saxes: 5.0.1
-      symbol-tree: 3.2.4
-      tough-cookie: 4.1.4
-      w3c-hr-time: 1.0.2
-      w3c-xmlserializer: 2.0.0
-      webidl-conversions: 6.1.0
-      whatwg-encoding: 1.0.5
-      whatwg-mimetype: 2.3.0
-      whatwg-url: 8.7.0
-      ws: 7.5.10(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      xml-name-validator: 3.0.0
-    optionalDependencies:
-      canvas: 2.11.2
-    transitivePeerDependencies:
-      - bufferutil
-      - supports-color
-      - utf-8-validate
-
-  jsdom@16.7.0(bufferutil@4.0.8)(canvas@2.11.2)(utf-8-validate@6.0.5):
-    dependencies:
-      abab: 2.0.6
-      acorn: 8.12.1
-      acorn-globals: 6.0.0
-      cssom: 0.4.4
-      cssstyle: 2.3.0
-      data-urls: 2.0.0
-      decimal.js: 10.4.3
-      domexception: 2.0.1
-      escodegen: 2.1.0
-      form-data: 3.0.2
-      html-encoding-sniffer: 2.0.1
-      http-proxy-agent: 4.0.1
-      https-proxy-agent: 5.0.1
-      is-potential-custom-element-name: 1.0.1
-      nwsapi: 2.2.10
-      parse5: 6.0.1
-      saxes: 5.0.1
-      symbol-tree: 3.2.4
-      tough-cookie: 4.1.4
-      w3c-hr-time: 1.0.2
-      w3c-xmlserializer: 2.0.0
-      webidl-conversions: 6.1.0
-      whatwg-encoding: 1.0.5
-      whatwg-mimetype: 2.3.0
-      whatwg-url: 8.7.0
-      ws: 7.5.10(bufferutil@4.0.8)(utf-8-validate@6.0.5)
-      xml-name-validator: 3.0.0
-    optionalDependencies:
-      canvas: 2.11.2
-    transitivePeerDependencies:
-      - bufferutil
-      - supports-color
-      - utf-8-validate
-
   jsdom@16.7.0(bufferutil@4.0.8)(canvas@3.0.1)(utf-8-validate@5.0.10):
     dependencies:
       abab: 2.0.6
@@ -6300,13 +6220,7 @@ snapshots:
 
   long@5.2.3: {}
 
-  lottie-node@2.0.0(canvas@2.11.2)(jsdom@16.7.0(bufferutil@4.0.8)(canvas@2.11.2)(utf-8-validate@6.0.5))(lottie-web@5.12.2):
-    dependencies:
-      canvas: 2.11.2
-      jsdom: 16.7.0(bufferutil@4.0.8)(canvas@2.11.2)(utf-8-validate@6.0.5)
-      lottie-web: 5.12.2
-
-  lottie-node@2.0.0(canvas@2.11.2)(jsdom@16.7.0(bufferutil@4.0.8)(canvas@3.0.1)(utf-8-validate@5.0.10))(lottie-web@5.12.2):
+  lottie-node@2.0.0(canvas@2.11.2)(jsdom@16.7.0(bufferutil@4.0.8)(canvas@2.11.2)(utf-8-validate@5.0.10))(lottie-web@5.12.2):
     dependencies:
       canvas: 2.11.2
       jsdom: 16.7.0(bufferutil@4.0.8)(canvas@3.0.1)(utf-8-validate@5.0.10)
@@ -6660,42 +6574,6 @@ snapshots:
 
   punycode@2.3.1: {}
 
-  q2tg-main@file:main(bufferutil@4.0.8)(elysia@1.1.26(@sinclair/typebox@0.34.13)(typescript@5.7.2))(utf-8-validate@5.0.10):
-    dependencies:
-      '@bogeychan/elysia-polyfills': 0.6.4(elysia@1.1.26(@sinclair/typebox@0.34.13)(typescript@5.7.2))
-      '@icqqjs/icqq': 1.4.0(patch_hash=4w6g4n5xncjdap3ncvvtjfe2uy)(bufferutil@4.0.8)(elysia@1.1.26(@sinclair/typebox@0.34.13)(typescript@5.7.2))(utf-8-validate@5.0.10)
-      '@prisma/client': 6.1.0(prisma@6.1.0)
-      dockerode: 4.0.2
-      prisma: 6.1.0
-      quote-api: https://github.com/Clansty/quote-api/archive/014b21138afbbe0e12c91b00561414b1e851fc0f.tar.gz(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      sharp: 0.33.5
-      silk-sdk: 0.2.2
-    transitivePeerDependencies:
-      - bufferutil
-      - debug
-      - elysia
-      - encoding
-      - supports-color
-      - utf-8-validate
-
-  q2tg-main@file:main(bufferutil@4.0.8)(elysia@1.1.26(@sinclair/typebox@0.34.13)(typescript@5.7.2))(utf-8-validate@6.0.5):
-    dependencies:
-      '@bogeychan/elysia-polyfills': 0.6.4(elysia@1.1.26(@sinclair/typebox@0.34.13)(typescript@5.7.2))
-      '@icqqjs/icqq': 1.4.0(patch_hash=4w6g4n5xncjdap3ncvvtjfe2uy)(bufferutil@4.0.8)(elysia@1.1.26(@sinclair/typebox@0.34.13)(typescript@5.7.2))(utf-8-validate@6.0.5)
-      '@prisma/client': 6.1.0(prisma@6.1.0)
-      dockerode: 4.0.2
-      prisma: 6.1.0
-      quote-api: https://github.com/Clansty/quote-api/archive/014b21138afbbe0e12c91b00561414b1e851fc0f.tar.gz(bufferutil@4.0.8)(utf-8-validate@6.0.5)
-      sharp: 0.33.5
-      silk-sdk: 0.2.2
-    transitivePeerDependencies:
-      - bufferutil
-      - debug
-      - elysia
-      - encoding
-      - supports-color
-      - utf-8-validate
-
   qs@6.12.1:
     dependencies:
       side-channel: 1.0.6
@@ -6714,41 +6592,14 @@ snapshots:
       dotenv: 7.0.0
       emoji-db: 14.0.1
       jimp: 0.22.12
-      jsdom: 16.7.0(bufferutil@4.0.8)(canvas@2.11.2)(utf-8-validate@5.0.10)
+      jsdom: 16.7.0(bufferutil@4.0.8)(canvas@3.0.1)(utf-8-validate@5.0.10)
       koa: 2.15.3
       koa-bodyparser: 4.4.1
       koa-logger: 3.2.1
       koa-ratelimit: 4.3.0
       koa-response-time: 2.1.0
       koa-router: 7.4.0
-      lottie-node: 2.0.0(canvas@2.11.2)(jsdom@16.7.0(bufferutil@4.0.8)(canvas@3.0.1)(utf-8-validate@5.0.10))(lottie-web@5.12.2)
-      lottie-web: 5.12.2
-      lru-cache: 5.1.1
-      object-sizeof: 1.6.3
-      runes: 0.4.3
-      sharp: 0.33.5
-      smartcrop-sharp: 2.0.8(sharp@0.33.5)
-      telegraf: 3.40.0
-    transitivePeerDependencies:
-      - bufferutil
-      - encoding
-      - supports-color
-      - utf-8-validate
-
-  quote-api@https://github.com/Clansty/quote-api/archive/014b21138afbbe0e12c91b00561414b1e851fc0f.tar.gz(bufferutil@4.0.8)(utf-8-validate@6.0.5):
-    dependencies:
-      canvas: 2.11.2
-      dotenv: 7.0.0
-      emoji-db: 14.0.1
-      jimp: 0.22.12
-      jsdom: 16.7.0(bufferutil@4.0.8)(canvas@2.11.2)(utf-8-validate@6.0.5)
-      koa: 2.15.3
-      koa-bodyparser: 4.4.1
-      koa-logger: 3.2.1
-      koa-ratelimit: 4.3.0
-      koa-response-time: 2.1.0
-      koa-router: 7.4.0
-      lottie-node: 2.0.0(canvas@2.11.2)(jsdom@16.7.0(bufferutil@4.0.8)(canvas@2.11.2)(utf-8-validate@6.0.5))(lottie-web@5.12.2)
+      lottie-node: 2.0.0(canvas@2.11.2)(jsdom@16.7.0(bufferutil@4.0.8)(canvas@2.11.2)(utf-8-validate@5.0.10))(lottie-web@5.12.2)
       lottie-web: 5.12.2
       lru-cache: 5.1.1
       object-sizeof: 1.6.3
@@ -7432,11 +7283,6 @@ snapshots:
     optionalDependencies:
       bufferutil: 4.0.8
       utf-8-validate: 5.0.10
-
-  ws@7.5.10(bufferutil@4.0.8)(utf-8-validate@6.0.5):
-    optionalDependencies:
-      bufferutil: 4.0.8
-      utf-8-validate: 6.0.5
 
   ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@5.0.10):
     optionalDependencies:
