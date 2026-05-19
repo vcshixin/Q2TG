@@ -59,6 +59,7 @@ export default new Elysia()
       }
 
       const now = new Date();
+      const avatarUrl = `https://q1.qlogo.cn/g?b=qq&nk=${params.userId}&s=0&time=${now.getTime()}`;
       const location = [profile.country, profile.province, profile.city].join(' ').trim();
       const birthday = (profile.birthday || []).some(it => it) ? profile.birthday.join('/') : '';
 
@@ -67,7 +68,7 @@ export default new Elysia()
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <meta property="og:image"
-              content={`https://q1.qlogo.cn/g?b=qq&nk=${params.userId}&s=0&time=${format(now, 'yyyy-MM-dd')}`}/>
+              content={avatarUrl}/>
         {
           memberInfo.title ?
             <meta property="og:site_name" content={`${memberInfo.role === 'member' ? '' : memberInfo.role}「${memberInfo.title}」`}/> :
@@ -155,7 +156,7 @@ export default new Elysia()
       </head>
       <body>
       <div id="app">
-        <img id="avatar" src={`https://q1.qlogo.cn/g?b=qq&nk=${params.userId}&s=0`} alt="头像"/>
+        <img id="avatar" src={avatarUrl} alt="头像"/>
         <div id="card">
           <div>
             <span class={`badge badge-${memberInfo.role} ${memberInfo.title && 'badge-hasTitle'}`}>{memberInfo.title || memberInfo.role}</span>
