@@ -66,6 +66,14 @@ export default class InChatCommandsController {
         pair.flags &= ~flags.DISABLE_Q2TG;
         await message.reply({ message: 'QQ->TG已启用' });
         return true;
+      case '/disable_qq_self_forward':
+        pair.flags &= ~flags.ENABLE_QQ_SELF_FORWARD;
+        await message.reply({ message: '自己在 QQ 发出的消息已停止同步到 TG' });
+        return true;
+      case '/enable_qq_self_forward':
+        pair.flags |= flags.ENABLE_QQ_SELF_FORWARD;
+        await message.reply({ message: '自己在 QQ 发出的消息将同步到 TG' });
+        return true;
       case '/disable_tg_forward':
         pair.flags |= flags.DISABLE_TG2Q;
         await message.reply({ message: 'TG->QQ已禁用' });

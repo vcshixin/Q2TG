@@ -28,6 +28,9 @@ export class NapCatClient extends QQClient {
   private friendCacheRefreshPromise?: Promise<void>;
   private readonly friendCacheTtlMs = 15 * 60 * 1000;
   private friendCacheLastRefreshAt = 0;
+  private readonly pendingOutgoingSelfMessages: Array<{ dm: boolean; chatId: number; expiresAt: number }> = [];
+  private readonly sentOutgoingSelfMessageIds = new Map<string, number>();
+  private readonly outgoingSelfMessageTtlMs = 60 * 1000;
 
   public static async create(params: CreateNapCatParams) {
     const instance = new this(params.id, params.wsUrl);
@@ -58,6 +61,52 @@ export class NapCatClient extends QQClient {
     });
   }
 
+  public markOutgoingSelfMessage(dm: boolean, chatId: number) {
+    this.cleanupOutgoingSelfMessages();
+    const entry = { dm, chatId, expiresAt: Date.now() + this.outgoingSelfMessageTtlMs };
+    this.pendingOutgoingSelfMessages.push(entry);
+    return () => {
+      const index = this.pendingOutgoingSelfMessages.indexOf(entry);
+      if (index >= 0) this.pendingOutgoingSelfMessages.splice(index, 1);
+    };
+  }
+
+  public markOutgoingSelfMessageId(dm: boolean, chatId: number, messageId: number | string) {
+    this.cleanupOutgoingSelfMessages();
+    this.sentOutgoingSelfMessageIds.set(this.outgoingSelfMessageKey(dm, chatId, messageId), Date.now() + this.outgoingSelfMessageTtlMs);
+  }
+
+  private shouldSkipOutgoingSelfMessage(data: WSReceiveHandler['message']) {
+    this.cleanupOutgoingSelfMessages();
+    const dm = data.message_type === 'private';
+    const chatId = dm ? data.user_id : data.group_id;
+    const key = this.outgoingSelfMessageKey(dm, chatId, data.message_id);
+    if (this.sentOutgoingSelfMessageIds.has(key)) {
+      this.sentOutgoingSelfMessageIds.delete(key);
+      return true;
+    }
+    const index = this.pendingOutgoingSelfMessages.findIndex(it => it.dm === dm && it.chatId === chatId);
+    if (index >= 0) {
+      this.pendingOutgoingSelfMessages.splice(index, 1);
+      return true;
+    }
+    return false;
+  }
+
+  private outgoingSelfMessageKey(dm: boolean, chatId: number, messageId: number | string) {
+    return `${dm ? 'private' : 'group'}:${chatId}:${messageId}`;
+  }
+
+  private cleanupOutgoingSelfMessages() {
+    const now = Date.now();
+    for (let i = this.pendingOutgoingSelfMessages.length - 1; i >= 0; i--) {
+      if (this.pendingOutgoingSelfMessages[i].expiresAt <= now) this.pendingOutgoingSelfMessages.splice(i, 1);
+    }
+    for (const [key, expiresAt] of this.sentOutgoingSelfMessageIds) {
+      if (expiresAt <= now) this.sentOutgoingSelfMessageIds.delete(key);
+    }
+  }
+
   private async handleWebSocketMessage(message: string) {
     this.logger.debug('receive', message);
     const data = JSON.parse(message) as WSReceiveHandler[keyof WSReceiveHandler] & { echo: string; status: 'ok' | 'error'; data: any; message: string };
@@ -73,8 +122,8 @@ export class NapCatClient extends QQClient {
       }
       return;
     }
-    if (data.post_type === 'message')
-      await this.handleMessage(data);
+    if (data.post_type === 'message' || data.post_type === 'message_sent')
+      await this.handleMessage(data as WSReceiveHandler['message'], data.post_type === 'message_sent');
     else if (data.post_type === 'notice' && data.notice_type === 'group_increase')
       await this.handleGroupIncrease(data);
     else if (data.post_type === 'notice' && data.notice_type === 'group_decrease')
@@ -101,7 +150,8 @@ export class NapCatClient extends QQClient {
   public uin: number;
   public nickname: string;
 
-  private async handleMessage(data: WSReceiveHandler['message']) {
+  private async handleMessage(data: WSReceiveHandler['message'], self = false) {
+    if (self && this.shouldSkipOutgoingSelfMessage(data)) return;
     let chat: Friend | Group;
     if (data.message_type === 'private') {
       // sender 一定是对方
@@ -136,6 +186,8 @@ export class NapCatClient extends QQClient {
       data.message_id.toString(),
       replyMessage?.sender.user_id === this.uin || message.some(it => it.type === 'at' && it.data.qq.toString() === this.uin.toString()),
       message.some(it => it.type === 'at' && (it.data.qq.toString() === '0' || !it.data.qq || it.data.qq === 'all')),
+      undefined,
+      self,
     );
     for (const handler of this.onMessageHandlers) {
       if (await handler(event)) {

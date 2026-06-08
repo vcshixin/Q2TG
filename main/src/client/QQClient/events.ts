@@ -51,6 +51,7 @@ export class MessageEvent extends ChatEvent {
     public readonly atMe: boolean,
     public readonly atAll: boolean,
     public readonly tempChatFromGroupId?: number,
+    public readonly self = false,
   ) {
     super(chat);
   }

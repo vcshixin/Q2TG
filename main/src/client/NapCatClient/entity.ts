@@ -110,18 +110,25 @@ abstract class NapCatUser extends NapCatEntity implements QQUser {
   }
 
   protected async sendMsgImpl(message: Send[keyof Send][], extra = {}): Promise<MessageRet> {
-    const data = await this.client.callApi('send_private_msg', {
-      user_id: this.uin,
-      ...extra,
-      // @ts-ignore 库的问题
-      message,
-    });
-    return {
-      message_id: data.message_id.toString(),
-      seq: data.message_id,
-      time: Date.now() / 1000,
-      rand: 0,
-    };
+    const releaseOutgoingSelfMessage = this.client.markOutgoingSelfMessage(true, this.uin);
+    try {
+      const data = await this.client.callApi('send_private_msg', {
+        user_id: this.uin,
+        ...extra,
+        // @ts-ignore 库的问题
+        message,
+      });
+      this.client.markOutgoingSelfMessageId(true, this.uin, data.message_id);
+      return {
+        message_id: data.message_id.toString(),
+        seq: data.message_id,
+        time: Date.now() / 1000,
+        rand: 0,
+      };
+    }
+    finally {
+      releaseOutgoingSelfMessage();
+    }
   }
 
   async poke(self?: boolean): Promise<boolean> {
@@ -235,18 +242,25 @@ export class NapCatGroup extends NapCatEntity implements Group {
   }
 
   protected async sendMsgImpl(message: Send[keyof Send][], extra = {}): Promise<MessageRet> {
-    const data = await this.client.callApi('send_group_msg', {
-      group_id: this.gid,
-      ...extra,
-      // @ts-ignore 库的问题
-      message,
-    });
-    return {
-      message_id: data.message_id.toString(),
-      seq: data.message_id,
-      time: Date.now() / 1000,
-      rand: 0,
-    };
+    const releaseOutgoingSelfMessage = this.client.markOutgoingSelfMessage(false, this.gid);
+    try {
+      const data = await this.client.callApi('send_group_msg', {
+        group_id: this.gid,
+        ...extra,
+        // @ts-ignore 库的问题
+        message,
+      });
+      this.client.markOutgoingSelfMessageId(false, this.gid, data.message_id);
+      return {
+        message_id: data.message_id.toString(),
+        seq: data.message_id,
+        time: Date.now() / 1000,
+        rand: 0,
+      };
+    }
+    finally {
+      releaseOutgoingSelfMessage();
+    }
   }
 
   pickMember(uid: number, strict?: boolean): GroupMember {

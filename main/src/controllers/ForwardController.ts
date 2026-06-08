@@ -48,10 +48,23 @@ export default class ForwardController {
     try {
       const pair = this.instance.forwardPairs.find(event.chat);
       if (!pair) return;
-      if ((pair.flags | this.instance.flags) & flags.DISABLE_Q2TG) return;
+      const pairFlags = pair.flags | this.instance.flags;
+      if (pairFlags & flags.DISABLE_Q2TG) return;
+      if (event.self) {
+        if (!(pairFlags & flags.ENABLE_QQ_SELF_FORWARD)) return;
+        const repeatedFromTelegram = await db.message.findFirst({
+          where: {
+            qqRoomId: pair.qqRoomId,
+            qqSenderId: event.from.id,
+            seq: event.seq,
+            instanceId: this.instance.id,
+          },
+        });
+        if (repeatedFromTelegram) return;
+      }
       // 如果是多张图片的话，是一整条消息，只过一次，所以不受这个判断影响
       // 防止私聊消息重复，icqq bug
-      let existed = event.dm && await db.message.findFirst({
+      let existed = !event.self && event.dm && await db.message.findFirst({
         where: {
           qqRoomId: pair.qqRoomId,
           qqSenderId: event.from.id,

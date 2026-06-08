@@ -100,6 +100,8 @@ const groupInChatCommands = [
   }),
   new Api.BotCommand({ command: 'disable_qq_forward', description: '停止从QQ转发至TG' }),
   new Api.BotCommand({ command: 'enable_qq_forward', description: '恢复从QQ转发至TG' }),
+  new Api.BotCommand({ command: 'disable_qq_self_forward', description: '停止同步自己在QQ发出的消息' }),
+  new Api.BotCommand({ command: 'enable_qq_self_forward', description: '同步自己在QQ发出的消息' }),
   new Api.BotCommand({ command: 'disable_tg_forward', description: '停止从TG转发至QQ' }),
   new Api.BotCommand({ command: 'enable_tg_forward', description: '恢复从TG转发至QQ' }),
 ];
@@ -114,6 +116,8 @@ const personalInChatCommands = [
     command: 'poke',
     description: '戳一戳',
   }),
+  new Api.BotCommand({ command: 'disable_qq_self_forward', description: '停止同步自己在QQ发出的消息' }),
+  new Api.BotCommand({ command: 'enable_qq_self_forward', description: '同步自己在QQ发出的消息' }),
   new Api.BotCommand({
     command: 'nick',
     description: '获取/设置群名片',
